@@ -1,3 +1,6 @@
+---------BRONZE LAYER CODES!!!!!!!!------------
+-------------------------------------------------
+
 USE ARC_EMPLOYEE_MANAGEMENT_SYSTEM;
 CREATE TABLE employees (
 employee_id INT,
@@ -106,4 +109,67 @@ CREATE SCHEMA IF NOT EXISTS bronze;
 ARC_EMPLOYEE_MANAGEMENT_SYSTEM.BRONZE.EMPLOYEESARC_EMPLOYEE_MANAGEMENT_SYSTEM.BRONZE.EMPLOYEESALTER TABLE employees
 RENAME TO ARC_EMPLOYEE_MANAGEMENT_SYSTEM.bronze.employees;
 
-SELECT * FROM employees;ARC_EMPLOYEE_MANAGEMENT_SYSTEM.BRONZE
+SELECT * FROM ARC_EMPLOYEE_MANAGEMENT_SYSTEM.BRONZE.EMPLOYEES;
+
+------------------------------------------------------------
+-------------SILVER LAYER-----------------------------------
+------------------------------------------------------------
+CREATE OR REPLACE TABLE SILVER.EMPLOYEES AS
+SELECT
+employee_id,
+TRIM(employee_name) AS employee_name,
+UPPER(TRIM(department)) AS department,
+salary,
+hire_date
+FROM BRONZE.EMPLOYEES;
+
+---REMOVE duplicates:
+SELECT employee_id, COUNT(*)
+FROM SILVER.EMPLOYEES
+GROUP BY employee_id
+HAVING COUNT(*) > 1;
+
+CREATE OR REPLACE TABLE SILVER.EMPLOYEES AS
+SELECT *
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY employee_id
+               ORDER BY employee_id
+           ) AS rn
+    FROM SILVER.EMPLOYEES
+)
+WHERE rn = 1;
+
+---Remove blank rows!
+DELETE FROM SILVER.EMPLOYEES
+WHERE employee_name LIKE 'Employee_%';
+
+select * FROM SILVER.EMPLOYEES;
+
+
+-------------------------------------------
+------------Gold Layer---------------------
+-------------------------------------------
+
+----1. Data aggregation
+
+CREATE OR REPLACE TABLE GOLD.DEPARTMENT_SALARY_SUMMARY AS
+SELECT
+department,
+COUNT(*) AS total_employees,
+AVG(salary) AS avg_salary,
+SUM(salary) AS total_salary
+FROM SILVER.EMPLOYEES
+GROUP BY department;
+
+-----Business KPIs
+
+CREATE OR REPLACE TABLE GOLD.COMPANY_KPIs AS
+SELECT
+COUNT(*) AS total,
+MAX(salary) AS highest_salary,
+MIN(salary) AS lowest_salary
+FROM SILVER.EMPLOYEES;
+
+
