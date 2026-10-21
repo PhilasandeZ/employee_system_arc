@@ -1,222 +1,242 @@
-Based on your Snowflake project, screenshots, and SQL scripts, here is an updated README.md that highlights your Snowflake skills and demonstrates the Bronze, Silver, and Gold architecture you implemented. The project includes database design, schema management, data loading, data cleaning, and business reporting using Snowflake SQL.
+Phila Zungu - Snowflake Data Engineering Portfolio
+👋 About Me
 
-Employee Management Data Warehouse Project (Snowflake)
-Overview
+I am an aspiring Data Engineer with hands-on experience in designing and implementing data warehouse solutions using Snowflake SQL and the Medallion Architecture (Bronze, Silver, Gold) approach.
 
-This project demonstrates my ability to design and implement a modern data warehouse solution in Snowflake using the Medallion Architecture (Bronze, Silver, and Gold Layers).
+My focus is on building scalable data pipelines, transforming raw data into trusted business-ready datasets, and creating reporting structures that support analytics and decision-making.
 
-The solution follows industry-standard data engineering practices by:
-
-Loading raw employee data into a Bronze layer
-Cleaning and transforming data in a Silver layer
-Creating business-ready aggregates and KPIs in a Gold layer
-Using Snowflake SQL for data processing and analytics
-Technologies Used
-Snowflake
-SQL
+🛠️ Technical Skills
 Data Warehousing
-ETL / ELT Processes
-Medallion Architecture
-Data Cleaning & Transformation
-Data Aggregation & Reporting
-Git & GitHub
-Project Architecture
-Bronze Layer (Raw Data Ingestion)
+Snowflake Data Warehouse
+Medallion Architecture (Bronze, Silver, Gold)
+Schema Design
+Data Modeling
+ETL Development
+SQL Development
+DDL (CREATE, ALTER, DROP)
+DML (INSERT, UPDATE, DELETE, MERGE)
+Complex Joins
+Window Functions
+Aggregations
+Stored Procedures (Basic)
+Query Optimization
+Data Transformation & Cleaning
+Data Quality Validation
+Deduplication
+Data Standardization
+Null Handling
+Data Type Management
+Business Rule Implementation
+Snowflake Features
+Databases
+Schemas
+Tables
+Views
+Stages
+Data Loading
+Virtual Warehouses
+Role-Based Access Concepts
+Version Control & Development Tools
+Git
+GitHub
+Visual Studio Code
+SQL Development
+📊 Snowflake Data Warehouse Project
+Project Overview
 
-Created a raw employee table and loaded employee data into Snowflake.
+Built an Employee Management Data Warehouse using Snowflake following the Medallion Architecture framework.
 
-Key Skills Demonstrated
+The solution demonstrates how raw employee data is ingested, cleansed, validated, transformed, and aggregated into reporting-ready datasets.
 
-Database creation
-Schema design
-Table creation
-Data ingestion
-Synthetic data generation using GENERATOR()
-Data validation
+🥉 Bronze Layer (Raw Data)
+Purpose
 
-Example:
+Store data exactly as received from source files without applying business transformations.
 
-CREATE TABLE employees (
-    employee_id INT,
-    employee_name VARCHAR(255),
-    department STRING,
-    salary NUMBER(10,2),
-    hire_date DATE
+Activities Performed
+Imported CSV files into Snowflake.
+Created Bronze schema and tables.
+Loaded employee data into raw staging tables.
+Preserved source data for auditing and reprocessing.
+Sample Skills Demonstrated
+SQL
+CREATE OR REPLACE DATABASE employee_management;
+ 
+CREATE OR REPLACE SCHEMA bronze;
+ 
+CREATE OR REPLACE TABLE bronze.employees (
+employee_id NUMBER,
+employee_name VARCHAR,
+department VARCHAR,
+salary NUMBER,
+hire_date DATE
 );
+🥈 Silver Layer (Cleansed Data)
+Purpose
 
+Transform and clean raw data into trusted datasets.
 
-Additional records were generated using Snowflake functions:
-
+Activities Performed
+Removed duplicate records.
+Standardized employee names.
+Validated salary information.
+Handled null and blank records.
+Applied business rules.
+Improved data quality.
+Skills Demonstrated
+SQL
 SELECT
-    151 + ROW_NUMBER() OVER (ORDER BY SEQ4()) AS employee_id,
-    'Employee_' || ROW_NUMBER() OVER (ORDER BY SEQ4()) AS employee_name
-FROM TABLE(GENERATOR(ROWCOUNT => 50));
-
-
-Skills:
-
-Snowflake DDL
-Snowflake DML
-ROW_NUMBER()
-GENERATOR()
-Sequence generation
-Data loading
-Silver Layer (Data Cleaning & Transformation)
-
-Created a cleansed data layer to improve data quality.
-
-Transformations performed:
-
-✅ Trimmed extra spaces
-
-✅ Standardized department names
-
-✅ Removed duplicate records
-
-✅ Removed unwanted generated employee records
-
-Example:
-
-CREATE OR REPLACE TABLE SILVER.EMPLOYEES AS
-SELECT
-    employee_id,
-    TRIM(employee_name) AS employee_name,
-    UPPER(TRIM(department)) AS department,
-    salary,
-    hire_date
-FROM BRONZE.EMPLOYEES;
-
-
-Duplicate removal:
-
-ROW_NUMBER() OVER (
-    PARTITION BY employee_id
-    ORDER BY employee_id
-)
-
-
-Data quality cleanup:
-
-DELETE FROM SILVER.EMPLOYEES
-WHERE employee_name LIKE 'Employee_%';
-
-
-Skills:
-
-Data Cleansing
+employee_id,
+TRIM(UPPER(employee_name)) AS employee_name,
+department,
+salary,
+hire_date
+FROM bronze.employees;
+Data Quality Processes
 TRIM()
 UPPER()
 ROW_NUMBER()
-Window Functions
+CASE Statements
+Data Validation Checks
 Duplicate Removal
-Data Quality Management
-ETL Transformations
-Gold Layer (Business Reporting)
+🥇 Gold Layer (Business Reporting)
+Purpose
 
-Built business-ready reporting tables for analytics and decision-making.
+Create business-ready datasets for analytics and reporting.
 
-Department Salary Summary
-CREATE OR REPLACE TABLE GOLD.DEPARTMENT_SALARY_SUMMARY AS
+Activities Performed
+Built departmental summaries.
+Created salary analytics tables.
+Generated KPI reporting datasets.
+Produced aggregated business metrics.
+Sample Gold Layer Query
+SQL
+CREATE OR REPLACE TABLE gold.department_salary_summary AS
+ 
 SELECT
-    department,
-    COUNT(*) AS total_employees,
-    AVG(salary) AS avg_salary,
-    SUM(salary) AS total_salary
-FROM SILVER.EMPLOYEES
+department,
+COUNT(*) AS total_employees,
+AVG(salary) AS average_salary,
+SUM(salary) AS total_salary
+FROM silver.employees
 GROUP BY department;
-
-
-Produces:
-
-Total employees per department
-Average salary per department
-Total salary expenditure per department
-Company KPIs
-CREATE OR REPLACE TABLE GOLD.COMPANY_KPIs AS
+📈 Reporting & Analytics
+Employee KPIs
+Total Employees
+Average Salary
+Highest Salary
+Lowest Salary
+Salary by Department
+Employees per Department
+Example KPI Query
+SQL
 SELECT
-    COUNT(*) AS total,
-    MAX(salary) AS highest_salary,
-    MIN(salary) AS lowest_salary
-FROM SILVER.EMPLOYEES;
+COUNT(*) AS total_employees,
+AVG(salary) AS avg_salary,
+MAX(salary) AS highest_salary,
+MIN(salary) AS lowest_salary
+FROM silver.employees;
+🚀 Snowflake Skills Demonstrated
+Data Ingestion
 
+✅ Load CSV Files into Snowflake
 
-Produces:
+✅ Create Raw Landing Zones
 
-Total employees
-Highest salary
-Lowest salary
+✅ Build Bronze Layer Tables
 
-Skills:
+✅ Manage Data Imports
 
-Data Aggregation
-KPI Development
-Business Intelligence
-Reporting Tables
+Data Transformation
+
+✅ Data Cleansing
+
+✅ Data Validation
+
+✅ Data Standardization
+
+✅ Duplicate Removal
+
+✅ Business Rule Application
+
+Data Warehousing
+
+✅ Database Design
+
+✅ Schema Design
+
+✅ Bronze-Silver-Gold Architecture
+
+✅ Fact & Dimension Concepts
+
+✅ Data Pipeline Development
+
+SQL Capabilities
+
+✅ Table Creation
+
+✅ Data Manipulation
+
+✅ Window Functions
+
+✅ Aggregations
+
+✅ Filtering
+
+✅ Joins
+
+✅ Ranking Functions
+
+✅ Conditional Logic
+
+Example Snowflake Functions Used
+SQL
+TRIM()
+UPPER()
+LOWER()
+ROW_NUMBER()
+COUNT()
 SUM()
 AVG()
-COUNT()
 MIN()
 MAX()
-Grouping & Analytics
-Snowflake Skills Demonstrated
-Data Warehousing
-Medallion Architecture
-Bronze / Silver / Gold Layer Design
-Data Modeling
-Data Pipeline Development
-Snowflake SQL
-DDL Commands
-DML Commands
-Data Manipulation
-Schema Management
-Table Management
-Database Administration
-Data Transformation
-Data Cleaning
-Standardization
-Deduplication
-Data Validation
-Data Quality Checks
-Analytics
-KPI Generation
-Aggregations
-Department-Level Reporting
-Performance Metrics
-Advanced SQL
-Window Functions
-ROW_NUMBER()
-CASE Statements
-Aggregate Functions
-Date Functions
-Project Outcomes
+DATEADD()
+CASE
+COALESCE()
+📂 Project Structure
+Plain Text
+SNOWFLAKE-DATA-WAREHOUSE
+│
+├── Bronze
+│ └── Raw Employee Data
+│
+├── Silver
+│ └── Cleaned Employee Data
+│
+├── Gold
+│ ├── Department Salary Summary
+│ ├── Employee KPIs
+│ └── Reporting Tables
+│
+└── README.md
+🎯 Key Achievements
+Designed a complete Snowflake Data Warehouse solution.
+Implemented Bronze, Silver, and Gold schemas.
+Imported and transformed employee datasets.
+Applied data quality and cleansing rules.
+Built reporting-ready Gold layer tables.
+Developed reusable SQL scripts for ETL processes.
+Demonstrated end-to-end data engineering workflow using Snowflake.
+📚 Learning Focus
 
-✔ Designed a complete Snowflake Data Warehouse
+Currently expanding expertise in:
 
-✔ Implemented Medallion Architecture
-
-✔ Created Bronze, Silver, and Gold schemas
-
-✔ Performed data cleansing and transformation
-
-✔ Built aggregated business reporting tables
-
-✔ Generated employee and department KPIs
-
-✔ Demonstrated end-to-end ELT workflow using Snowflake SQL
-
-Author
-
-Phila Zungu
- ICT Professional | Data Engineering Enthusiast
-
-Core Skills
-Snowflake
-SQL
-Data Warehousing
-ETL / ELT
-Data Modeling
-Data Analytics
-Git & GitHub
-Database Administration
-
-This project showcases practical experience in building scalable data warehouse solutions using Snowflake and industry-standard data engineering practices.
+Snowflake Advanced Features
+Data Engineering Best Practices
+ETL Frameworks
+Data Pipeline Automation
+Cloud Data Platforms
+Azure Data Factory
+Databricks
+Power BI
+Git & CI/CD
